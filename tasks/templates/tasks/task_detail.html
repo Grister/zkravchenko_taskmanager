@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Task Details</h2>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>ID:</th>
+            <td>{{ task.id }}</td>
+          </tr>
+          <tr>
+            <th>Title:</th>
+            <td>{{ task.title }}</td>
+          </tr>
+          <tr>
+            <th>Description:</th>
+            <td>{{ task.description }}</td>
+          </tr>
+          <tr>
+            <th>Status:</th>
+            <td>{{ task.status }}</td>
+          </tr>
+          <tr>
+            <th>Created At:</th>
+            <td>{{ task.created_at }}</td>
+          </tr>
+          <tr>
+            <th>Updated At:</th>
+            <td>{{ task.updated_at }}</td>
+          </tr>
+          <tr>
+            <th>Reporter:</th>
+            <td>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th>ID:</th>
+                        <td>{{ task.reporter.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Username:</th>
+                        <td>{{ task.reporter.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ task.reporter.email }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+          </tr>
+          <tr>
+            <th>Assignee:</th>
+            <td>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th>ID:</th>
+                        <td>{{ task.assignee.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Username:</th>
+                        <td>{{ task.assignee.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ task.assignee.email }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

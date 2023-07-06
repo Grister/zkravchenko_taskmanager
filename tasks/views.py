@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 
 from tasks.forms import TaskCreateForm, TaskUpdateForm
@@ -19,27 +19,11 @@ def about_view(request):
 
 def detail_view(request, uuid):
     task = get_object_or_404(TaskModel, id=uuid)
-    data = {
-        'id': task.id,
-        'title': task.title,
-        'description': task.description,
-        'status': task.status,
-        'created_at': task.created_at,
-        'updated_at': task.updated_at,
-        'reporter': {
-            'id': task.reporter.id,
-            'username': task.reporter.username,
-            'email': task.reporter.email
-        },
-        'assignee': {
-            'id': task.assignee.id,
-            'username': task.assignee.username,
-            'email': task.assignee.email
-        }
-    }
-    return JsonResponse(data, safe=False)
+    context = {'task': task}
+    return render(request, "tasks/task_detail.html", context)
 
 
+@login_required
 def create_view(request):
     if request.method == 'POST':
         form = TaskCreateForm(request.POST, user=request.user)
@@ -52,6 +36,7 @@ def create_view(request):
     return render(request, 'tasks/task_create.html', {'form': form})
 
 
+@login_required
 def update_view(request, uuid):
     task = get_object_or_404(TaskModel, id=uuid)
     if request.user not in (task.reporter, task.assignee):
@@ -77,6 +62,7 @@ def update_view(request, uuid):
     return render(request, 'tasks/task_update.html', {'form': form, 'task': task})
 
 
+@login_required
 def delete_view(request, uuid):
     task = get_object_or_404(TaskModel, id=uuid)
     if request.user == task.reporter and task.status is False:

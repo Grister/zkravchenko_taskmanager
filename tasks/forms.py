@@ -5,14 +5,24 @@ from tasks.models import TaskModel
 
 
 class TaskCreateForm(forms.Form):
-    title = forms.CharField(max_length=32, widget=forms.TextInput(attrs={
-         'class': "form-control"}))
-    description = forms.CharField(required=False, widget=forms.TextInput(attrs={
-         'class': "form-control"}))
-
-    assignee = forms.ModelChoiceField(queryset=get_user_model().objects.all(), widget=forms.Select(attrs={
-        'class': "form-control"
-    }))
+    title = forms.CharField(
+        max_length=32,
+        widget=forms.TextInput(attrs={
+            'class': "form-control"
+        })
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': "form-control"
+        })
+    )
+    assignee = forms.ModelChoiceField(
+        queryset=get_user_model().objects.all(),
+        widget=forms.Select(attrs={
+            'class': "form-control"
+        })
+    )
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -30,9 +40,20 @@ class TaskCreateForm(forms.Form):
 
 
 class TaskUpdateForm(forms.Form):
-    title = forms.CharField(max_length=64, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
-    status = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
-    assignee = forms.ModelChoiceField(required=False, queryset=get_user_model().objects.all(), widget=forms.Select(attrs={
-        'class': "form-control"
-    }))
+    title = forms.CharField(
+        max_length=64,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control'})
+    )
+    status = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    assignee = forms.ModelChoiceField(
+        required=False,
+        queryset=get_user_model().objects.all(),
+        widget=forms.Select(attrs={'class': "form-control"})
+    )

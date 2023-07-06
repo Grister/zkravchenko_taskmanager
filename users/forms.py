@@ -6,18 +6,45 @@ UserModel = get_user_model()
 
 
 class UserRegistrationForm(forms.Form):
-    username = forms.CharField(max_length=32, widget=forms.TextInput(attrs={
-         'class': "form-control", 'placeholder': "Enter your username"}))
-    first_name = forms.CharField(required=False, widget=forms.TextInput(attrs={
-         'class': "form-control", 'placeholder': "Enter your first name"}))
-    last_name = forms.CharField(required=False, widget=forms.TextInput(attrs={
-         'class': "form-control", 'placeholder': "Enter your last name"}))
-    email = forms.EmailField(widget=forms.EmailInput(attrs={
-        'class': "form-control", 'placeholder': "Enter your email"}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class': "form-control", 'placeholder': "Enter your password"}))
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class': "form-control", 'placeholder': "Confirm your password"}))
+    username = forms.CharField(
+        max_length=32,
+        widget=forms.TextInput(attrs={
+            'class': "form-control",
+            'placeholder': "Enter your username"
+        })
+    )
+    first_name = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': "form-control",
+            'placeholder': "Enter your first name"
+        })
+    )
+    last_name = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': "form-control",
+            'placeholder': "Enter your last name"
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': "form-control",
+            'placeholder': "Enter your email"
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': "form-control",
+            'placeholder': "Enter your password"
+        })
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': "form-control",
+            'placeholder': "Confirm your password"
+        })
+    )
 
     def clean_username(self) -> str:
         username = self.cleaned_data["username"]
@@ -52,10 +79,19 @@ class UserRegistrationForm(forms.Form):
 
 
 class UserLoginForm(forms.Form):
-    username = forms.CharField(max_length=32, widget=forms.TextInput(attrs={
-        'class': "form-control", 'placeholder': "Enter your username"}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class': "form-control", 'placeholder': "Enter your password"}))
+    username = forms.CharField(
+        max_length=32,
+        widget=forms.TextInput(attrs={
+            'class': "form-control",
+            'placeholder': "Enter your username"
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': "form-control",
+            'placeholder': "Enter your password"
+        })
+    )
 
     def clean(self):
         cleaned_data = super().clean()

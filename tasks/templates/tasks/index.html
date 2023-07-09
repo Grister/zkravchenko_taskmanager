@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-md-8">
-            {% for task in tasks %}
+            {% for task in object_list %}
                 {% include 'tasks/_task.html' %}
             {% endfor %}
         </div>

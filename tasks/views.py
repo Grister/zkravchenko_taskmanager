@@ -55,6 +55,14 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         uuid = self.kwargs.get('uuid')
         return get_object_or_404(TaskModel, id=uuid)
 
+    def get(self, request, *args, **kwargs):
+        task = self.get_object()
+        if request.user not in (task.reporter, task.assignee):
+            messages.error(request, "You are not allowed to update this task.")
+            return redirect('tasks:index')
+
+        return super().get(self, request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         task = self.get_object()
         if request.user not in (task.reporter, task.assignee):
@@ -79,6 +87,13 @@ class TaskDeleteView(DeleteView, LoginRequiredMixin):
     def get_object(self, queryset=None):
         uuid = self.kwargs.get('uuid')
         return get_object_or_404(TaskModel, id=uuid)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.reporter != request.user or self.object.status:
+            messages.error(request, "You are not allowed to delete this task.")
+            return redirect('tasks:index')
+        return super().get(self, request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

@@ -3,18 +3,27 @@
 {% block content %}
     <div class="row">
         <div class="col-md-8">
+            {% if messages %}
+                <div class="alert alert-warning"
+                     role="alert"
+                     style="margin-top: 50px;">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
             {% for task in object_list %}
                 {% include 'tasks/_task.html' %}
             {% endfor %}
         </div>
-    {% if user.is_authenticated %}
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Welcome, {{ user.username }}</h5>
+        {% if user.is_authenticated %}
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Welcome, {{ user.username }}</h5>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
     </div>
 {% endblock %}

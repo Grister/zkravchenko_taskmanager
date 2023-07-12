@@ -1,5 +1,6 @@
 from django.contrib.auth.views import LogoutView, LoginView
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic import CreateView
 
 from users.forms import UserRegistrationForm, UserLoginForm
@@ -8,7 +9,9 @@ from users.forms import UserRegistrationForm, UserLoginForm
 class UserRegistrationView(CreateView):
     template_name = 'users/register.html'
     form_class = UserRegistrationForm
-    success_url = '/sign-in/'
+
+    def get_success_url(self):
+        return reverse('users:sign_in')
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

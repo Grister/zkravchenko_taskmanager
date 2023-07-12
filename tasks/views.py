@@ -1,70 +1,109 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
+from django.views.generic import ListView, DeleteView, CreateView, TemplateView, DetailView, UpdateView
 
 from tasks.forms import TaskCreateForm, TaskUpdateForm
-from tasks.models import TaskModel, UserModel
+from tasks.models import TaskModel
 
 
-def list_view(request):
-    tasks = TaskModel.objects.all().order_by('-created_at')
-    data = {
-        'tasks': list(tasks)
-    }
-    return render(request, "tasks/index.html", data)
+class TaskListView(ListView):
+    model = TaskModel
+    template_name = 'tasks/index.html'
+    ordering = ['-created_at']
 
 
-def about_view(request):
-    return render(request, "about.html")
+class AboutPageView(TemplateView):
+    template_name = 'about.html'
 
 
-def detail_view(request, uuid):
-    task = get_object_or_404(TaskModel, id=uuid)
-    context = {'task': task}
-    return render(request, "tasks/task_detail.html", context)
+class TaskDetailView(DetailView):
+    model = TaskModel
+    template_name = 'tasks/task_detail.html'
+    context_object_name = 'task'
+
+    def get_object(self, queryset=None):
+        uuid = self.kwargs.get('uuid')
+        return get_object_or_404(TaskModel, id=uuid)
 
 
-@login_required
-def create_view(request):
-    if request.method == 'POST':
-        form = TaskCreateForm(request.POST, user=request.user)
-        if form.is_valid():
-            form.save()
+class TaskCreateView(LoginRequiredMixin, CreateView):
+    model = TaskModel
+    form_class = TaskCreateForm
+    template_name = 'tasks/task_create.html'
+    login_url = '/sign-in/'
+
+    def get_success_url(self):
+        return reverse('tasks:index')
+
+    def form_valid(self, form):
+        form.instance.reporter = self.request.user
+        return super(TaskCreateView, self).form_valid(form)
+
+
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
+    model = TaskModel
+    form_class = TaskUpdateForm
+    login_url = '/sign-in/'
+    template_name = 'tasks/task_update.html'
+
+    def get_success_url(self):
+        return reverse('tasks:index')
+
+    def get_object(self, queryset=None):
+        uuid = self.kwargs.get('uuid')
+        return get_object_or_404(TaskModel, id=uuid)
+
+    def can_update(self):
+        task = self.get_object()
+        if self.request.user not in (task.reporter, task.assignee):
+            messages.error(self.request, "You are not allowed to update this task.")
+            return False
+        return True
+
+    def get(self, request, *args, **kwargs):
+        if not self.can_update():
             return redirect('tasks:index')
-    else:
-        form = TaskCreateForm(user=request.user)
 
-    return render(request, 'tasks/task_create.html', {'form': form})
+        return super().get(self, request, *args, **kwargs)
 
-
-@login_required
-def update_view(request, uuid):
-    task = get_object_or_404(TaskModel, id=uuid)
-    if request.user not in (task.reporter, task.assignee):
-        return redirect('tasks:index')
-
-    if request.method == 'POST':
-        form = TaskUpdateForm(request.POST)
-        if form.is_valid():
-            task.title = form.cleaned_data['title']
-            task.description = form.cleaned_data['description']
-            task.status = form.cleaned_data['status']
-            task.assignee = form.cleaned_data['assignee'] or task.assignee
-            task.save()
+    def post(self, request, *args, **kwargs):
+        if not self.can_update():
             return redirect('tasks:index')
-    else:
-        form = TaskUpdateForm(initial={
-            'title': task.title,
-            'description': task.description,
-            'status': task.status,
-            'assignee': task.assignee
-        })
 
-    return render(request, 'tasks/task_update.html', {'form': form, 'task': task})
+        return super().post(self, request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.assignee = form.cleaned_data['assignee'] or self.request.user
+        return super().form_valid(form)
 
 
-@login_required
-def delete_view(request, uuid):
-    task = get_object_or_404(TaskModel, id=uuid)
-    if request.user == task.reporter and task.status is False:
-        task.delete()
-    return redirect('tasks:index')
+class TaskDeleteView(DeleteView, LoginRequiredMixin):
+    model = TaskModel
+    login_url = '/sign-in/'
+    template_name = "tasks/confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse('tasks:index')
+
+    def get_object(self, queryset=None):
+        uuid = self.kwargs.get('uuid')
+        return get_object_or_404(TaskModel, id=uuid)
+
+    def can_delete(self):
+        task = self.get_object()
+        if task.reporter != self.request.user or task.status:
+            messages.error(self.request, "You are not allowed to delete this task.")
+            return False
+        return True
+
+    def get(self, request, *args, **kwargs):
+        if not self.can_delete():
+            return redirect('tasks:index')
+        return super().get(self, request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not self.can_delete():
+            return redirect('tasks:index')
+        return super().post(self, request, *args, **kwargs)

@@ -6,7 +6,7 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Update task {{ task.id }}</h5>
+                    <h5 class="card-title">Update task {{ object.id }}</h5>
                     <form method="post" novalidate>
                         {% csrf_token %}
                         <div class="form-group">
@@ -28,7 +28,7 @@
                             {{ form.status }}
                         </div>
                         <div class="form-group">
-                            {% if user == task.reporter %}
+                            {% if user == object.reporter %}
                                 <label for="{{ form.assignee.id_for_label }}" class="form-label">
                                 {{ form.assignee.label }}
                             </label>

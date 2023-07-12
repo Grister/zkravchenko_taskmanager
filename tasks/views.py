@@ -55,18 +55,21 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         uuid = self.kwargs.get('uuid')
         return get_object_or_404(TaskModel, id=uuid)
 
-    def get(self, request, *args, **kwargs):
+    def can_update(self):
         task = self.get_object()
-        if request.user not in (task.reporter, task.assignee):
-            messages.error(request, "You are not allowed to update this task.")
+        if self.request.user not in (task.reporter, task.assignee):
+            messages.error(self.request, "You are not allowed to update this task.")
+            return False
+        return True
+
+    def get(self, request, *args, **kwargs):
+        if not self.can_update():
             return redirect('tasks:index')
 
         return super().get(self, request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        task = self.get_object()
-        if request.user not in (task.reporter, task.assignee):
-            messages.error(request, "You are not allowed to update this task.")
+        if not self.can_update():
             return redirect('tasks:index')
 
         return super().post(self, request, *args, **kwargs)
@@ -88,16 +91,19 @@ class TaskDeleteView(DeleteView, LoginRequiredMixin):
         uuid = self.kwargs.get('uuid')
         return get_object_or_404(TaskModel, id=uuid)
 
+    def can_delete(self):
+        task = self.get_object()
+        if task.reporter != self.request.user or task.status:
+            messages.error(self.request, "You are not allowed to delete this task.")
+            return False
+        return True
+
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.reporter != request.user or self.object.status:
-            messages.error(request, "You are not allowed to delete this task.")
+        if not self.can_delete():
             return redirect('tasks:index')
         return super().get(self, request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.reporter != request.user or self.object.status:
-            messages.error(request, "You are not allowed to delete this task.")
+        if not self.can_delete():
             return redirect('tasks:index')
         return super().post(self, request, *args, **kwargs)

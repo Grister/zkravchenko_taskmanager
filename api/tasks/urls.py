@@ -5,5 +5,5 @@ app_name = 'tasks_api'
 
 urlpatterns = [
     path('', views.TaskListAPIView.as_view()),
-    path('<uuid:id>/', views.TaskRetrieveUpdateDestroyAPIView.as_view())
+    path('<uuid:pk>/', views.TaskRetrieveUpdateDestroyAPIView.as_view())
 ]

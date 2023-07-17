@@ -16,13 +16,13 @@ class UserRegistrationView(CreateView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return super().get(request, *args, **kwargs)
-        return redirect('/tasks')
+        return redirect('/tasks/')
 
 
 class UserLoginView(LoginView):
     template_name = 'users/login.html'
-    redirect_authenticated_user = '/tasks'
-    next_page = '/tasks'
+    redirect_authenticated_user = '/tasks/'
+    next_page = '/tasks/'
     form_class = UserLoginForm
 
 

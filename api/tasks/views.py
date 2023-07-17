@@ -1,14 +1,22 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-
-from api.tasks.serializers import TaskSerializer
+from rest_framework.permissions import SAFE_METHODS
+from api.tasks import serializers
 from tasks.models import TaskModel
 
 
 class TaskListAPIView(ListCreateAPIView):
     queryset = TaskModel.objects.all()
-    serializer_class = TaskSerializer
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return serializers.TaskReadSerializer
+        return serializers.TaskWriteSerializer
 
 
 class TaskRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = TaskModel.objects.all()
-    serializer_class = TaskSerializer
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return serializers.TaskReadSerializer
+        return serializers.TaskWriteSerializer

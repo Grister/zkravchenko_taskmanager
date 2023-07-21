@@ -5,6 +5,9 @@ from tasks.models import TaskModel
 
 class TaskPermission(BasePermission):
     def has_object_permission(self, request, view, obj: TaskModel) -> bool:
+        if request.method in ['GET']:
+            return True
+
         return request.user == obj.reporter or request.user == obj.assignee
 
 
